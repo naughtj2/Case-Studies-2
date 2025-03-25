@@ -14,10 +14,17 @@ void create_matrix(int n, double* lower, double* diag, double* upper) {
 void print_array(const char* name, double* array, int size) {
     printf("%s: [", name);
     for (int i = 0; i < size; i++) {
-        printf("%.1f", array[i]);
+        printf("%.6f", array[i]);
         if (i < size - 1) printf(", ");
     }
     printf("]\n");
+}
+
+void create_b_vector(int n, double* b){
+    
+    for (int i = 0; i < n; i++){
+        b[i] = (double)(i + 1) / n;
+    }
 }
 
 int main() {
@@ -25,15 +32,20 @@ int main() {
     double* lower = (double*)calloc(n - 1, sizeof(double));
     double* diag = (double*)calloc(n, sizeof(double));
     double* upper = (double*)calloc(n - 1, sizeof(double));
+    double* b = (double*)calloc(n, sizeof(double));
 
     create_matrix(n, lower, diag, upper);
+    create_b_vector(n, b);
 
     print_array("Lower", lower, n - 1);
     print_array("Diag", diag, n);
     print_array("Upper", upper, n - 1);
+    print_array("b Vector", b, n);
 
     free(lower);
     free(diag);
     free(upper);
-    
+    free(b);
+
+    return 0;    
 }
