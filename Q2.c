@@ -110,7 +110,7 @@ int gmres(double* lower, double* diag, double* upper, double* b, int n, int m, d
 }
 
 int main() {
-    int dims[] = {8, 16, 32};
+    int dims[] = {8, 16, 32, 64, 128, 256};
     int num_dims = sizeof(dims) / sizeof(dims[0]);
 
     for (int i = 0; i < num_dims; i++) {
@@ -125,12 +125,12 @@ int main() {
 
     create_matrix(n, lower, diag, upper);
     create_b_vector(n, b);
-
+    double b_norm = vector_norm(b, n);
     int steps = gmres(lower, diag, upper, b, n, m, x, residuals);
-    printf("Final residual for n = %d: %e\n", n, residuals[steps - 1]);
-    printf("Final approximation of x:\n");
-    for (int j = 0; j < n; j++){
-        printf("%e \n", x[j]);
+    printf("Normealised residuals for n = %d:\n", n);
+    for(int j = 0; j < steps; j++){
+        double normalised_residual = residuals[j] / b_norm;
+        printf("%d, %e\n", j, normalised_residual); 
     }
     printf("\n");
 
