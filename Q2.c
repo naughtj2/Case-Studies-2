@@ -110,7 +110,11 @@ int gmres(double* lower, double* diag, double* upper, double* b, int n, int m, d
 }
 
 int main() {
-    int n = 8;
+    int dims[] = {8, 16, 32};
+    int num_dims = sizeof(dims) / sizeof(dims[0]);
+
+    for (int i = 0; i < num_dims; i++) {
+    int n = dims[i];
     double m = n / 2;
     double* lower = (double*)calloc(n - 1, sizeof(double));
     double* diag = (double*)calloc(n, sizeof(double));
@@ -136,6 +140,6 @@ int main() {
     free(b);
     free(x);
     free(residuals);
-    
+    }
     return 0;    
 }
