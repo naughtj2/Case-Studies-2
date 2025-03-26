@@ -127,7 +127,7 @@ int main() {
     create_b_vector(n, b);
     double b_norm = vector_norm(b, n);
     int steps = gmres(lower, diag, upper, b, n, m, x, residuals);
-    printf("Normealised residuals for n = %d:\n", n);
+    printf("Normalised residuals for n = %d:\n", n);
     for(int j = 0; j < steps; j++){
         double normalised_residual = residuals[j] / b_norm;
         printf("%d, %e\n", j, normalised_residual); 
