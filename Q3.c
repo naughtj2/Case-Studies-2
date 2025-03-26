@@ -24,7 +24,7 @@ void print_array(const char* name, double* array, int size) {
 
 // Function to create b vector
 void create_b_vector(int n, double* b){
-    
+    #pragma omp parallel for
     for (int i = 0; i < n; i++){
         b[i] = (double)(i + 1) / n;
     }
@@ -37,6 +37,7 @@ void matvec_mult(double* lower, double* diag, double* upper,double* x, double* r
         return;
     }
     result[0] = diag[0] * x[0] + upper[0] * x[1];
+    #pragma omp parallel for
     for (int i = 1; i < n - 1; i++) {
         result[i] = lower[i - 1] * x[i - 1] + diag[i] * x[i] + upper[i] * x[i + 1];
     }
@@ -46,6 +47,7 @@ void matvec_mult(double* lower, double* diag, double* upper,double* x, double* r
 // Function to calculate dot product
 double dot_product(double* v1, double* v2, int n) {
     double sum = 0.0;
+    #pragma omp parallel for reduction(+:sum)
     for (int i = 0; i < n; i++) sum += v1[i] * v2[i];
     return sum;
 }
@@ -72,10 +74,12 @@ int gmres(double* lower, double* diag, double* upper, double* b, int n, int m, d
     double* Av = (double*)malloc(n * sizeof(double));
 
     matvec_mult(lower, diag, upper, x, r, n);
+    #pragma omp parallel for
     for (int i = 0; i < n; i++) r[i] = b[i] - r[i];
 
     double beta = vector_norm(r, n);
     residuals[0] = beta;
+    #pragma omp parallel for
     for (int i = 0; i < n; i++) V[0][i] = r[i] / beta;
 
     int actual_m = m;
@@ -83,6 +87,7 @@ int gmres(double* lower, double* diag, double* upper, double* b, int n, int m, d
         matvec_mult(lower, diag, upper, V[j], Av, n);
         for (int i = 0; i <= j; i++) {
             H[i][j] = dot_product(V[i], Av, n);
+            #pragma omp parallel for
             for (int k = 0; k < n; k++) Av[k] -= H[i][j] * V[i][k];
         }
         if (j + 1 >= m) {
@@ -94,6 +99,7 @@ int gmres(double* lower, double* diag, double* upper, double* b, int n, int m, d
             actual_m = j + 1;
             break;
         }
+        #pragma omp parallel for
         for (int k = 0; k < n; k++) V[j + 1][k] = Av[k] / H[j + 1][j];
     }
 
@@ -108,6 +114,7 @@ int gmres(double* lower, double* diag, double* upper, double* b, int n, int m, d
     }
     
     // Compute final solution x = V * y
+    #pragma omp parallel for
     for (int i = 0; i < n; i++) {
         x[i] = 0.0;
         for (int j = 0; j < m; j++) {
